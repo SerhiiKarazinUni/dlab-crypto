@@ -19,44 +19,61 @@ struct biguint{
     }
 
     biguint(const string hex){
+        setHex(hex);
+    }
+
+    biguint& setHex(const string hex)
+    {
         if(hex.length() == 0){
             data = new uint64_t [0];
             size = 0;
-            return;
-        }
+        } else {
 
-        string _hex = string(hex);
+            string _hex = string(hex);
 
-        if(hex.length()%2 == 1){
-            _hex += '0';
-        }
+            if (hex.length() % 2 == 1) {
+                _hex += '0';
+            }
 
-        //adjust buffer length to fit the number
-        char sz = sizeof(uint64_t);
-        this->size = ceil(_hex.length()/2.0f/sz);
-        this->data = new uint64_t[this->size+1];
+            //adjust buffer length to fit the number
+            char sz = sizeof(uint64_t);
+            this->size = ceil(_hex.length() / 2.0f / sz);
+            this->data = new uint64_t[this->size + 1];
 
-        //read each byte into a temporary buffer
-        char* buffer = new char[sz];
-        unsigned int p = 0;
-        unsigned int k = 0;
-        for (unsigned int i = 0; i < _hex.length(); i += 2) {
-            string byteString = _hex.substr(i, 2);
-            buffer[p] = (char) strtol(byteString.c_str(), NULL, 16);
-            p++;
+            //read each byte into a temporary buffer
+            char *buffer = new char[sz];
+            unsigned int p = 0;
+            unsigned int k = 0;
+            for (unsigned int i = 0; i < _hex.length(); i += 2) {
+                string byteString = _hex.substr(i, 2);
+                buffer[p] = (char) strtol(byteString.c_str(), NULL, 16);
+                p++;
 
-            if(p == sz){
-                //need to push current buffer to struct data buffer
+                if (p == sz) {
+                    //need to push current buffer to struct data buffer
+                    memcpy(&(data[k]), buffer, sz);
+                    memset(buffer, 0, sz);
+                    k++;
+                    p = 0;
+                }
+            }
+
+            // if the temporary buffer is not empty -- flush it into the data buffer
+            if (p > 0) {
                 memcpy(&(data[k]), buffer, sz);
-                memset(buffer, 0 , sz);
-                k++;
-                p=0;
             }
         }
+        return *this;
+    }
 
-        // if the temporary buffer is not empty -- flush it into the data buffer
-        if(p>0){
-            memcpy(&(data[k]), buffer, sz);
+    void toHex(char* buf, size_t sz) const {
+        size_t l = 0;
+        for (size_t i = 0; i < this->size; i++) {
+            for(size_t k=0; k < sizeof(uint64_t); k++) {
+                if((l*2) >= sz) return;
+                snprintf(buf+2*l, 3, "%.2x", ((unsigned char *) &this->data[i])[k]);
+                l+=1;
+            }
         }
     }
 };
@@ -107,14 +124,12 @@ biguint operator >> (biguint& src, const int shift) {
 }
 
 ostream& operator << (ostream& out, const biguint& num) {
-    char* buffer = new char[2];
+    size_t sz = sizeof(uint64_t) * 2 * num.size;
+    char* buffer = new char[sz+1];
+    memset(buffer, 0, sz+1);
 
-    for (char i = 0; i < num.size; i++) {
-        for(size_t k=0; k<sizeof(uint64_t); k++) {
-            printf("%.2x", ((unsigned char *) &num.data[i])[k]);
-            out << buffer;
-        }
-    }
+    num.toHex(buffer, sz);
+    out<<buffer;
 
     return out;
 }
