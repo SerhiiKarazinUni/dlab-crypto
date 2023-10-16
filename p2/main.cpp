@@ -8,27 +8,29 @@ struct biguint {
     size_t size;
 
     biguint() {
-        data = new uint64_t[0];
+        data = nullptr;
         size = 0;
     }
 
-    biguint(biguint *ref) {
+    explicit biguint(biguint *ref) {
         this->data = new uint64_t[ref->size];
         memcpy(this->data, ref->data, sizeof(uint64_t) * ref->size);
         this->size = ref->size;
     }
 
-    biguint(const string hex) {
-        setHex(hex);
+    explicit biguint(const string hex) {
+        this->setHex(hex);
     }
 
     biguint &setHex(const string hex) {
+        delete[] data;
+
         if (hex.length() == 0) {
             data = new uint64_t[0];
             size = 0;
         } else {
 
-            string _hex = string(hex);
+            auto _hex = string(hex);
 
             // in case of uneven length of the string -- add padding '0'
             if (hex.length() % 2 == 1) {
@@ -41,7 +43,7 @@ struct biguint {
             this->data = new uint64_t[this->size + 1];
 
             //read each byte into a temporary buffer
-            char *buffer = new char[sz];
+            auto *buffer = new char[sz];
             unsigned int bufPointer = 0;
             unsigned int portionPointer = 0;
             for (unsigned int i = 0; i < _hex.length(); i += 2) {
@@ -62,6 +64,8 @@ struct biguint {
             if (bufPointer > 0) {
                 memcpy(&(data[portionPointer]), buffer, sz);
             }
+
+            delete[] buffer;
         }
         return *this;
     }
@@ -142,11 +146,13 @@ biguint operator>>(biguint &src, const int shift) {
 
 ostream &operator<<(ostream &out, const biguint &num) {
     size_t sz = sizeof(uint64_t) * 2 * num.size;
-    char *buffer = new char[sz + 1];
+    auto *buffer = new char[sz + 1];
     memset(buffer, 0, sz + 1);
 
     num.getHex(buffer, sz);
     out << buffer;
+
+    delete[] buffer;
 
     return out;
 }
@@ -248,31 +254,31 @@ int main() {
     biguint numberB = biguint();
 
     // note: getHex() is under the hood of << operator
-    cout << "setHex(), getHex():\n";
+    cout << "setHex(), getHex():" << endl;
     cout << "numberA = FFFFFFFFFFFFFFFF0000000000000000: " << numberA.setHex("FFFFFFFFFFFFFFFF0000000000000000")
          << endl;
     cout << "numberB = FF0000FF00000000000000FF00000000: " << numberB.setHex("FF0000FF00000000000000FF00000000") << endl
          << endl;
 
-    cout << "INV:\n";
-    cout << "~numberA: " << (~numberA) << "\n";
-    cout << "~numberB: " << (~numberB) << "\n\n";
+    cout << "INV:" << endl;
+    cout << "~numberA: " << (~numberA) << endl;
+    cout << "~numberB: " << (~numberB) << endl << endl;
 
     cout << "XOR:\n";
-    cout << "numberA^numberB: " << (numberA ^ numberB) << "\n";
-    cout << "should be      : 00ffff00ffffffff000000ff\n\n";
+    cout << "numberA^numberB: " << (numberA ^ numberB) << endl;
+    cout << "should be      : 00ffff00ffffffff000000ff" << endl << endl;
 
     cout << "OR:\n";
-    cout << "numberA|numberB: " << (numberA | numberB) << "\n";
-    cout << "should be      : ffffffffffffffff000000ff\n\n";
+    cout << "numberA|numberB: " << (numberA | numberB) << endl;
+    cout << "should be      : ffffffffffffffff000000ff" << endl << endl;
 
     cout << "AND:\n";
-    cout << "numberA&numberB: " << (numberA & numberB) << "\n";
-    cout << "should be      : ff0000ff\n\n";
+    cout << "numberA&numberB: " << (numberA & numberB) << endl;
+    cout << "should be      : ff0000ff" << endl << endl;
 
-    cout << "Bitwise shifting left and right 4 bits of numberA:\n";
-    cout << "SRC: " << numberA << "\n";
-    cout << "LFT: " << (numberA << 4) << "\n";
-    cout << "RGT: " << (numberA >> 4) << "\n";
+    cout << "Bitwise shifting left and right 4 bits of numberA:" << endl;
+    cout << "SRC: " << numberA << endl;
+    cout << "LFT: " << (numberA << 4) << endl;
+    cout << "RGT: " << (numberA >> 4) << endl;
     return 0;
 }
