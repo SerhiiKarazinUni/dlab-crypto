@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact name="p7:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/p7_jar</output-path>
+    <root id="root">
+      <element id="archive" name="p7.jar">
+        <element id="module-output" name="p7" />
+      </element>
+      <element id="library" level="project" name="bouncycastle.bcprov.debug.jdk18on" />
+    </root>
+  </artifact>
+</component>

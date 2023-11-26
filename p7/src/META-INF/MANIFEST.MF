@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: Main
+Class-Path: bcprov-debug-jdk18on-1.77.jar
+
