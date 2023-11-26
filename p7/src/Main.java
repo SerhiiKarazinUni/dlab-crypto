@@ -35,6 +35,7 @@ public class Main {
         }
 
         try {
+
             byte[] message = sMessage.getBytes(StandardCharsets.UTF_8);
             System.out.println("Message:\n" + b2hex(message));
 

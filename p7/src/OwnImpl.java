@@ -32,24 +32,9 @@ class OwnImpl implements DoesECDSA {
 
         do {
             do {
-                // NOTE: here we can generate our own random K, so the process will not be deterministic
-                // by utilising our fake randomness source we can compare BC's ECDSA implementation and ours
-                // as their signatures will be binary equal in this case
-
-                // If you want to use true randomness, use this code:
-                /*
-                    Random rand = new Random();
-                    k = new BigInteger(N.bitLength(), rand);
-                    while (k.compareTo(N) >= 0) {
-                        k = new BigInteger(N.bitLength(), rand);
-                    }
-                */
-
-                // This one is for fake randomness
                 byte[] kBytes = new byte[32];
                 new MyRandomness().nextBytes(kBytes);
                 k = new BigInteger(kBytes);
-                // ---
 
                 // multiply k*G
                 ECPoint kG = G.multiply(k).normalize();

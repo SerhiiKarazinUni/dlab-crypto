@@ -48,9 +48,9 @@ Own ECDSA smoke test using own verify (invalid signature): PASSED
 
 ## Usage
 
-You may run the application "as is", so it will:
+You may run the program without any command line arguments, so it will:
 * Use "Hello, world" as message plaintext
-* Use deterministic ECDSA implementation, which means that all random values are predefined. Please see `MyRandomness` class for more details.
+* Use deterministic ECDSA implementation, which means that all random values are pre-defined. Please see `MyRandomness` class for more details.
 
 The application does:
 * SHA-256 hashing of plaintext message
@@ -60,7 +60,7 @@ The application does:
 * ECDSA signature verification using own implementation
 * ECDSA signature verification of the own signature using Bouncy Castle's implementation
 
-As we use fake source of randomness, binary values of signatures should be (and they are indeed) equal for BC's and own ECDSA implementations.
+As we use fake source of randomness, binary values of signatures should be (and they are indeed) equal between BC's and own ECDSA implementations.
 
 The program accepts two command line arguments:
 
